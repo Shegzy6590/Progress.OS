@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Progress-OS · Full Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════ */
+:root {
+  --bg:          #080b10;
+  --bg2:         #0d1119;
+  --glass:       rgba(255,255,255,0.032);
+  --glass-b:     rgba(255,255,255,0.07);
+  --border:      rgba(255,255,255,0.08);
+  --border-hot:  rgba(245,180,50,0.35);
+
+  --gold:        #f5b432;
+  --gold-light:  #ffd166;
+  --gold-dim:    rgba(245,180,50,0.18);
+  --gold-glow:   rgba(245,180,50,0.25);
+
+  --emerald:     #2ef8a0;
+  --emerald-dim: rgba(46,248,160,0.15);
+  --blue:        #4da6ff;
+  --blue-dim:    rgba(77,166,255,0.15);
+  --rose:        #ff6b8a;
+  --rose-dim:    rgba(255,107,138,0.15);
+  --purple:      #c084fc;
+  --purple-dim:  rgba(192,132,252,0.15);
+  --orange:      #fb923c;
+  --orange-dim:  rgba(251,146,60,0.15);
+
+  --text:        #eef2f8;
+  --text-2:      #8d9bb0;
+  --text-3:      #4a5568;
+
+  --display:     'Syne', sans-serif;
+  --body:        'Outfit', sans-serif;
+
+  --r-sm:  12px;
+  --r-md:  18px;
+  --r-lg:  24px;
+  --r-xl:  32px;
+}
+
+/* ═══════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 10% 0%, rgba(245,180,50,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 100%, rgba(77,166,255,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 50% 50%, rgba(46,248,160,0.025) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ═══════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════ */
+.shell {
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 0 0 120px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══════════════════════════════════════════
+   PAGES (tab system)
+═══════════════════════════════════════════ */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ═══════════════════════════════════════════
+   TOP NAV
+═══════════════════════════════════════════ */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(180deg, rgba(8,11,16,0.95) 70%, transparent);
+  backdrop-filter: blur(12px);
+}
+.topbar-logo {
+  font-family: var(--display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.topbar-right { display: flex; gap: 10px; align-items: center; }
+.topbar-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.topbar-icon:hover { border-color: var(--border-hot); background: var(--gold-dim); }
+
+/* ═══════════════════════════════════════════
+   GLASS CARD BASE
+═══════════════════════════════════════════ */
+.card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s;
+  animation: fadeUp 0.45s ease both;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06);
+}
+.cards-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 16px;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card:nth-child(1)  { animation-delay: 0.00s; }
+.card:nth-child(2)  { animation-delay: 0.06s; }
+.card:nth-child(3)  { animation-delay: 0.12s; }
+.card:nth-child(4)  { animation-delay: 0.18s; }
+.card:nth-child(5)  { animation-delay: 0.24s; }
+.card:nth-child(6)  { animation-delay: 0.30s; }
+.card:nth-child(7)  { animation-delay: 0.36s; }
+.card:nth-child(8)  { animation-delay: 0.42s; }
+.card:nth-child(9)  { animation-delay: 0.48s; }
+.card:nth-child(10) { animation-delay: 0.54s; }
+
+/* ═══════════════════════════════════════════
+   SECTION DIVIDER
+═══════════════════════════════════════════ */
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 20px 8px;
+}
+.section-head span {
+  font-family: var(--display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+}
+.section-head::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(245,180,50,0.2), transparent);
+}
+
+/* ═══════════════════════════════════════════
+   PROFILE HERO CARD
+═══════════════════════════════════════════ */
+.profile-card {
+  margin: 14px 16px 0;
+  padding: 24px;
+  border-radius: var(--r-xl);
+  border-color: rgba(245,180,50,0.2);
+  background: linear-gradient(145deg, rgba(245,180,50,0.08) 0%, rgba(255,255,255,0.03) 60%, rgba(77,166,255,0.04) 100%);
+}
+.profile-card::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 20px; right: 20px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.6;
+}
+.profile-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.avatar-wrap { position: relative; flex-shrink: 0; }
+.avatar {
+  width: 58px; height: 58px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--gold) 0%, #e8960a 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #080b10;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 0 2px rgba(245,180,50,0.3), 0 8px 24px rgba(245,180,50,0.2);
+}
+.avatar-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 22px;
+  border: 1.5px solid transparent;
+  background: linear-gradient(135deg, var(--gold), transparent, var(--blue)) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+}
+.profile-info { flex: 1; }
+.profile-name { font-family: var(--display); font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; margin-bottom: 5px; }
+.profile-name input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: var(--display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  width: 100%;
+  cursor: pointer;
+}
+.profile-name input::placeholder { color: var(--text-2); }
+.profile-name input:focus { border-bottom: 1px solid var(--gold); }
+.profile-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--gold-dim);
+  border: 1px solid rgba(245,180,50,0.25);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--gold-light);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.profile-level::before { content: '◆'; font-size: 0.55rem; }
+.momentum-badge { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--text-2); }
+.momentum-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--emerald);
+  box-shadow: 0 0 8px var(--emerald);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.8); } }
+.save-name-btn {
+  background: var(--gold-dim);
+  border: 1px solid rgba(245,180,50,0.3);
+  border-radius: 8px;
+  color: var(--gold);
+  font-size: 0.75rem;
+  font-family: var(--body);
+  font-weight: 600;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 8px;
+  display: inline-block;
+}
+.save-name-btn:hover { background: rgba(245,180,50,0.25); }
+.score-ring-wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.ring-outer { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+.ring-svg { width: 80px; height: 80px; transform: rotate(-90deg); }
+.ring-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 6; }
+.ring-fill {
+  fill: none;
+  stroke: url(#ringGrad);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 226;
+  stroke-dashoffset: 226;
+  transition: stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1);
+  filter: drop-shadow(0 0 6px rgba(245,180,50,0.5));
+}
+.ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring-score {
+  font-family: var(--display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+.ring-unit { font-size: 0.58rem; color: var(--text-3); margin-top: 2px; }
+.score-breakdown { flex: 1; }
+.score-row-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
+.score-row-item:last-child { margin-bottom: 0; }
+.score-row-label { font-size: 0.72rem; color: var(--text-2); white-space: nowrap; }
+.score-micro-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; }
+.score-micro-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+.score-row-val { font-family: var(--display); font-size: 0.72rem; font-weight: 700; white-space: nowrap; }
+
+/* ═══════════════════════════════════════════
+   CTA CARD
+═══════════════════════════════════════════ */
+.cta-card {
+  padding: 24px;
+  border-radius: var(--r-xl);
+  background: linear-gradient(135deg, #b8730a 0%, #d4930f 35%, #f5b432 65%, #ffd166 100%);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.cta-card::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 60%);
+  pointer-events: none;
+}
+.cta-card::after {
+  content: '';
+  position: absolute;
+  bottom: -20px; right: -20px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+}
+.cta-card:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 24px 60px rgba(245,180,50,0.35); }
+.cta-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.cta-tag { font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(8,11,16,0.65); background: rgba(8,11,16,0.12); padding: 4px 10px; border-radius: 20px; }
+.cta-arrow { width: 36px; height: 36px; background: rgba(8,11,16,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: rgba(8,11,16,0.7); transition: transform 0.2s; }
+.cta-card:hover .cta-arrow { transform: translateX(4px); }
+.cta-title { font-family: var(--display); font-size: 1.35rem; font-weight: 800; color: #080b10; letter-spacing: -0.5px; line-height: 1.15; margin-bottom: 6px; }
+.cta-sub { font-size: 0.8rem; color: rgba(8,11,16,0.6); font-weight: 400; }
+
+/* ═══════════════════════════════════════════
+   MODULE CARDS
+═══════════════════════════════════════════ */
+.mod-card { padding: 20px; }
+.mod-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.mod-title-wrap { display: flex; align-items: center; gap: 10px; }
+.mod-icon { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+.mod-title { font-family: var(--display); font-size: 0.88rem; font-weight: 700; letter-spacing: -0.2px; }
+.mod-badge { font-size: 0.68rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+
+/* ═══════════════════════════════════════════
+   STAT PILLS
+═══════════════════════════════════════════ */
+.stat-pills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.stat-pill { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 12px 10px; text-align: center; }
+.stat-pill-val { font-family: var(--display); font-size: 1.3rem; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+.stat-pill-lbl { font-size: 0.62rem; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.8px; }
+
+/* ═══════════════════════════════════════════
+   PROGRESS BAR
+═══════════════════════════════════════════ */
+.prog-bar { height: 6px; background: rgba(255,255,255,0.07); border-radius: 6px; overflow: hidden; margin-top: 10px; }
+.prog-fill { height: 100%; border-radius: 6px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+.prog-gold    { background: linear-gradient(90deg, #b8730a, var(--gold-light)); box-shadow: 0 0 10px rgba(245,180,50,0.4); }
+.prog-emerald { background: linear-gradient(90deg, #1ab070, var(--emerald)); box-shadow: 0 0 10px rgba(46,248,160,0.35); }
+.prog-blue    { background: linear-gradient(90deg, #2563eb, var(--blue)); box-shadow: 0 0 10px rgba(77,166,255,0.35); }
+.prog-rose    { background: linear-gradient(90deg, #c2185b, var(--rose)); box-shadow: 0 0 10px rgba(255,107,138,0.35); }
+.prog-purple  { background: linear-gradient(90deg, #9333ea, var(--purple)); box-shadow: 0 0 10px rgba(192,132,252,0.35); }
+.prog-orange  { background: linear-gradient(90deg, #ea580c, var(--orange)); box-shadow: 0 0 10px rgba(251,146,60,0.35); }
+.prog-label { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-2); margin-bottom: 6px; }
+.prog-label strong { color: var(--text); font-weight: 600; }
+
+/* ═══════════════════════════════════════════
+   LIST ITEMS
+═══════════════════════════════════════════ */
+.item-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 11px 13px;
+  transition: border-color 0.2s, background 0.2s;
+  animation: slideIn 0.2s ease both;
+}
+.list-item:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); }
+@keyframes slideIn { from { opacity:0; transform: translateX(-8px); } to { opacity:1; transform: translateX(0); } }
+.list-item-text { flex: 1; font-size: 0.85rem; line-height: 1.3; color: var(--text); }
+.list-item-text.done { text-decoration: line-through; color: var(--text-3); }
+.check-btn {
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 0.7rem;
+  color: var(--text-3);
+  flex-shrink: 0;
+  transition: all 0.18s;
+  padding: 0 8px;
+  height: 26px;
+}
+.check-btn.checked { background: var(--emerald-dim); border-color: rgba(46,248,160,0.4); color: var(--emerald); }
+.check-btn:hover { border-color: var(--gold); color: var(--gold); }
+.del-btn {
+  border-radius: 7px;
+  background: rgba(255,107,138,0.08);
+  border: 1px solid rgba(255,107,138,0.15);
+  color: var(--rose);
+  font-size: 0.72rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  padding: 0 8px;
+  height: 26px;
+}
+.del-btn:hover { background: rgba(255,107,138,0.2); }
+.list-item-meta { font-size: 0.7rem; color: var(--text-3); font-family: var(--display); }
+.empty-state { text-align: center; padding: 24px; color: var(--text-3); font-size: 0.8rem; font-family: var(--display); }
+
+/* ═══════════════════════════════════════════
+   INPUT GROUP
+═══════════════════════════════════════════ */
+.input-group { display: flex; gap: 8px; margin-top: 14px; }
+.os-input {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 11px 14px;
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin: 0;
+}
+.os-input:focus { border-color: rgba(245,180,50,0.4); box-shadow: 0 0 0 3px rgba(245,180,50,0.06); }
+.os-input::placeholder { color: var(--text-3); }
+.os-input[type="datetime-local"] { color-scheme: dark; }
+.os-select {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 11px 14px;
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+}
+.os-select option { background: #0d1119; color: var(--text); }
+.os-btn {
+  padding: 11px 16px;
+  border-radius: var(--r-sm);
+  border: none;
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.os-btn:hover  { opacity: 0.88; }
+.os-btn:active { transform: scale(0.97); }
+.os-btn-gold    { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #080b10; }
+.os-btn-blue    { background: linear-gradient(135deg, #2563eb, var(--blue)); color: #fff; }
+.os-btn-rose    { background: var(--rose); color: #fff; }
+.os-btn-purple  { background: linear-gradient(135deg, #9333ea, var(--purple)); color: #fff; }
+.os-btn-orange  { background: linear-gradient(135deg, #ea580c, var(--orange)); color: #fff; }
+.os-btn-emerald { background: linear-gradient(135deg, #1ab070, var(--emerald)); color: #080b10; }
+.os-btn-ghost { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-2); }
+.os-btn-ghost:hover { border-color: var(--gold); color: var(--gold); opacity: 1; }
+
+/* ═══════════════════════════════════════════
+   FINANCE CARD
+═══════════════════════════════════════════ */
+.finance-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+.finance-col { display: flex; flex-direction: column; gap: 8px; }
+.balance-display {
+  text-align: center;
+  padding: 16px 12px 12px;
+  background: linear-gradient(145deg, rgba(245,180,50,0.06), rgba(245,180,50,0.02));
+  border: 1px solid rgba(245,180,50,0.15);
+  border-radius: var(--r-md);
+  margin-bottom: 14px;
+}
+.balance-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-3); margin-bottom: 4px; }
+.balance-amount { font-family: var(--display); font-size: 1.8rem; font-weight: 800; letter-spacing: -1px; }
+.balance-amount.pos { color: var(--emerald); text-shadow: 0 0 20px rgba(46,248,160,0.3); }
+.balance-amount.neg { color: var(--rose); }
+.balance-amount.zero { color: var(--text-2); }
+
+/* ═══════════════════════════════════════════
+   APPOINTMENTS
+═══════════════════════════════════════════ */
+.appt-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 13px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  transition: border-color 0.2s;
+  animation: slideIn 0.2s ease both;
+}
+.appt-item:hover { border-color: rgba(255,255,255,0.12); }
+.appt-dot-col { display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 3px; }
+.appt-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px rgba(245,180,50,0.5); flex-shrink: 0; }
+.appt-line { width: 1px; flex: 1; background: var(--border); min-height: 12px; }
+.appt-body { flex: 1; }
+.appt-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 3px; }
+.appt-time { font-size: 0.7rem; color: var(--text-2); font-family: var(--display); }
+
+/* ═══════════════════════════════════════════
+   AI COACH CARD
+═══════════════════════════════════════════ */
+.ai-card {
+  padding: 22px;
+  background: linear-gradient(145deg, rgba(77,166,255,0.06), rgba(255,255,255,0.02));
+  border-color: rgba(77,166,255,0.2);
+  position: relative;
+  overflow: hidden;
+}
+.ai-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--blue), var(--emerald), transparent);
+  opacity: 0.7;
+}
+.ai-orb {
+  width: 40px; height: 40px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(77,166,255,0.25), rgba(46,248,160,0.15));
+  border: 1px solid rgba(77,166,255,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+}
+.ai-label { font-size: 0.6rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; font-weight: 700; }
+#aiMessage { font-size: 0.9rem; line-height: 1.65; color: var(--text); font-weight: 300; }
+
+/* AI typing indicator */
+.ai-typing { display: flex; gap: 5px; align-items: center; height: 20px; }
+.ai-typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); animation: typing 1.2s infinite; }
+.ai-typing span:nth-child(2) { animation-delay: 0.2s; }
+.ai-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-5px); opacity: 1; } }
+
+/* ═══════════════════════════════════════════
+   LEARNING PATH CARD
+═══════════════════════════════════════════ */
+.learning-card {
+  background: linear-gradient(145deg, rgba(192,132,252,0.06), rgba(255,255,255,0.02));
+  border-color: rgba(192,132,252,0.2);
+}
+.resource-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  margin-bottom: 8px;
+  transition: border-color 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text);
+}
+.resource-item:hover { border-color: rgba(192,132,252,0.35); background: rgba(192,132,252,0.05); }
+.resource-icon { font-size: 1.1rem; flex-shrink: 0; width: 32px; text-align: center; }
+.resource-body { flex: 1; min-width: 0; }
+.resource-title { font-size: 0.83rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.resource-type { font-size: 0.68rem; color: var(--text-3); margin-top: 2px; }
+.resource-badge { font-size: 0.62rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: var(--purple-dim); color: var(--purple); white-space: nowrap; }
+
+/* skill progress item */
+.skill-prog { margin-bottom: 12px; }
+.skill-prog:last-child { margin-bottom: 0; }
+.skill-prog-label { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 5px; }
+.skill-prog-label span { color: var(--text-2); }
+.skill-prog-label strong { color: var(--text); }
+
+/* ═══════════════════════════════════════════
+   CV / CAREER CARD
+═══════════════════════════════════════════ */
+.cv-card { background: linear-gradient(145deg, rgba(77,166,255,0.05), rgba(255,255,255,0.02)); border-color: rgba(77,166,255,0.15); }
+.cv-entry {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  margin-bottom: 8px;
+}
+.cv-bullet { width: 32px; height: 32px; border-radius: 10px; background: var(--blue-dim); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
+.cv-body { flex: 1; }
+.cv-role { font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
+.cv-meta { font-size: 0.7rem; color: var(--text-3); }
+.skill-chip { display: inline-block; background: var(--blue-dim); border: 1px solid rgba(77,166,255,0.25); color: var(--blue); font-size: 0.65rem; font-weight: 600; padding: 3px 8px; border-radius: 10px; margin: 3px 3px 0 0; }
+
+/* Interview prep */
+.interview-q {
+  padding: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.interview-q:hover { border-color: rgba(77,166,255,0.3); }
+.interview-q-text { font-size: 0.83rem; font-weight: 600; margin-bottom: 6px; }
+.interview-q-tip { font-size: 0.75rem; color: var(--text-2); line-height: 1.5; display: none; }
+.interview-q.open .interview-q-tip { display: block; }
+.interview-q-toggle { font-size: 0.65rem; color: var(--blue); margin-top: 4px; }
+
+/* ═══════════════════════════════════════════
+   BUSINESS CARD
+═══════════════════════════════════════════ */
+.business-card { background: linear-gradient(145deg, rgba(251,146,60,0.05), rgba(255,255,255,0.02)); border-color: rgba(251,146,60,0.15); }
+.idea-item {
+  padding: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  margin-bottom: 8px;
+  animation: slideIn 0.2s ease both;
+}
+.idea-title { font-size: 0.88rem; font-weight: 700; margin-bottom: 6px; color: var(--orange); }
+.idea-desc { font-size: 0.78rem; color: var(--text-2); line-height: 1.55; margin-bottom: 8px; }
+.idea-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.idea-tag { font-size: 0.62rem; padding: 2px 8px; border-radius: 8px; background: var(--orange-dim); color: var(--orange); border: 1px solid rgba(251,146,60,0.2); }
+
+/* marketing plan steps */
+.mkt-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  margin-bottom: 8px;
+}
+.mkt-num { width: 26px; height: 26px; border-radius: 8px; background: var(--orange-dim); border: 1px solid rgba(251,146,60,0.25); display: flex; align-items: center; justify-content: center; font-family: var(--display); font-size: 0.75rem; font-weight: 700; color: var(--orange); flex-shrink: 0; }
+.mkt-text { font-size: 0.82rem; line-height: 1.5; color: var(--text-2); padding-top: 3px; }
+
+/* crm customers */
+.customer-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  margin-bottom: 8px;
+  animation: slideIn 0.2s ease both;
+}
+.customer-avatar { width: 34px; height: 34px; border-radius: 10px; background: var(--orange-dim); display: flex; align-items: center; justify-content: center; font-family: var(--display); font-weight: 700; font-size: 0.9rem; color: var(--orange); flex-shrink: 0; }
+.customer-body { flex: 1; }
+.customer-name { font-size: 0.85rem; font-weight: 600; }
+.customer-status { font-size: 0.7rem; color: var(--text-3); }
+
+/* ═══════════════════════════════════════════
+   NOTES CARD
+═══════════════════════════════════════════ */
+.note-item {
+  padding: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  margin-bottom: 8px;
+  animation: slideIn 0.2s ease both;
+}
+.note-text { font-size: 0.83rem; line-height: 1.6; color: var(--text); }
+.note-date { font-size: 0.68rem; color: var(--text-3); margin-top: 8px; font-family: var(--display); }
+.note-actions { display: flex; gap: 6px; margin-top: 8px; }
+.os-textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 11px 14px;
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 0.85rem;
+  outline: none;
+  resize: vertical;
+  min-height: 90px;
+  margin-top: 14px;
+  transition: border-color 0.2s;
+}
+.os-textarea:focus { border-color: rgba(245,180,50,0.4); }
+.os-textarea::placeholder { color: var(--text-3); }
+
+/* ═══════════════════════════════════════════
+   GOALS CARD
+═══════════════════════════════════════════ */
+.goal-item {
+  padding: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  margin-bottom: 8px;
+  animation: slideIn 0.2s ease both;
+}
+.goal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.goal-title { font-size: 0.85rem; font-weight: 600; }
+.goal-deadline { font-size: 0.68rem; color: var(--text-3); font-family: var(--display); }
+.goal-pct-label { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-2); margin-bottom: 5px; }
+.goal-edit-row { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+.goal-edit-row input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; color: var(--text); font-size: 0.8rem; outline: none; font-family: var(--body); }
+
+/* ═══════════════════════════════════════════
+   SETTINGS CARD
+═══════════════════════════════════════════ */
+.settings-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+
+/* ═══════════════════════════════════════════
+   BOTTOM NAV  (7 tabs)
+═══════════════════════════════════════════ */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  padding: 10px 12px 18px;
+  background: linear-gradient(0deg, rgba(8,11,16,0.98) 60%, transparent);
+  backdrop-filter: blur(16px);
+  z-index: 100;
+}
+.nav-pills {
+  display: flex;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px;
+  gap: 2px;
+}
+.nav-pill {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 7px 4px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  font-family: var(--body);
+}
+.nav-pill.active { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(245,180,50,0.2); }
+.nav-pill-icon { font-size: 0.95rem; }
+.nav-pill-lbl  { font-size: 0.5rem; font-weight: 600; letter-spacing: 0.3px; }
+
+/* ═══════════════════════════════════════════
+   LIGHT MODE
+═══════════════════════════════════════════ */
+body.light-mode {
+  --bg:    #f5f0e8;
+  --bg2:   #ede8dc;
+  --glass: rgba(255,255,255,0.6);
+  --border: rgba(0,0,0,0.08);
+  --text:  #1a1208;
+  --text-2: #7a6840;
+  --text-3: #b8a882;
+}
+body.light-mode::before { background: radial-gradient(ellipse 80% 50% at 10% 0%, rgba(245,180,50,0.12) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 90% 100%, rgba(77,166,255,0.07) 0%, transparent 60%); }
+body.light-mode .card { backdrop-filter: blur(30px); }
+body.light-mode .topbar { background: linear-gradient(180deg, rgba(245,240,232,0.97) 70%, transparent); }
+body.light-mode .bottom-nav { background: linear-gradient(0deg, rgba(245,240,232,0.99) 60%, transparent); }
+body.light-mode .os-input, body.light-mode .os-textarea, body.light-mode .os-select { background: rgba(0,0,0,0.04); color: var(--text); }
+body.light-mode .list-item, body.light-mode .stat-pill, body.light-mode .idea-item, body.light-mode .note-item, body.light-mode .goal-item, body.light-mode .cv-entry, body.light-mode .resource-item, body.light-mode .customer-item, body.light-mode .appt-item, body.light-mode .interview-q, body.light-mode .mkt-step { background: rgba(0,0,0,0.03); }
+
+/* ═══════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════ */
+.color-gold    { color: var(--gold); }
+.color-emerald { color: var(--emerald); }
+.color-blue    { color: var(--blue); }
+.color-rose    { color: var(--rose); }
+.color-purple  { color: var(--purple); }
+.color-orange  { color: var(--orange); }
+.bg-gold-dim    { background: var(--gold-dim); }
+.bg-emerald-dim { background: var(--emerald-dim); }
+.bg-blue-dim    { background: var(--blue-dim); }
+.bg-rose-dim    { background: var(--rose-dim); }
+.bg-purple-dim  { background: var(--purple-dim); }
+.bg-orange-dim  { background: var(--orange-dim); }
+button { font-family: var(--body); }
+.spacer { height: 6px; }
+.mt-8  { margin-top: 8px; }
+.mt-14 { margin-top: 14px; }
+
+/* Dual-column grid for pills */
+.stat-pills-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+
+/* tag badge for jobs */
+.job-tag { display: inline-block; font-size: 0.62rem; padding: 2px 8px; border-radius: 10px; background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(77,166,255,0.2); margin: 3px 3px 0 0; font-weight: 600; }
+
+/* match score */
+.match-score { font-family: var(--display); font-size: 1.1rem; font-weight: 800; color: var(--emerald); }
+</style>
+</head>
+<body>
+
+<!-- ═══ TOP BAR ═══ -->
+<div class="topbar">
+  <div class="topbar-logo">Progress·OS</div>
+  <div class="topbar-right">
+    <div class="topbar-icon" onclick="toggleTheme()" title="Toggle theme">☀</div>
+    <div class="topbar-icon" onclick="exportData()" title="Export data">⬇</div>
+  </div>
+</div>
+
+<div class="shell">
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: OVERVIEW (home)
+══════════════════════════════════════════════════ -->
+<div class="page active" id="page-overview">
+
+  <!-- PROFILE HERO -->
+  <div class="card profile-card">
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%"   stop-color="#b8730a"/>
+          <stop offset="100%" stop-color="#ffd166"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <div class="profile-top">
+      <div class="avatar-wrap">
+        <div class="avatar" id="avatarLetter">?</div>
+        <div class="avatar-ring"></div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">
+          <input id="userName" type="text" placeholder="Enter your name" maxlength="22" oninput="onNameInput()">
+        </div>
+        <div class="profile-level" id="profileLevel">Level 1 · Beginner</div>
+        <div class="momentum-badge">
+          <div class="momentum-dot"></div>
+          <span id="momentumStatus">System Active</span>
+        </div>
+      </div>
+    </div>
+    <button class="save-name-btn" onclick="saveProfile()">Save Profile →</button>
+    <div class="spacer"></div>
+    <div class="score-ring-wrap">
+      <div class="ring-outer">
+        <svg class="ring-svg" viewBox="0 0 80 80">
+          <circle class="ring-track" cx="40" cy="40" r="36"/>
+          <circle class="ring-fill" id="ringFill" cx="40" cy="40" r="36"/>
+        </svg>
+        <div class="ring-label">
+          <div class="ring-score" id="ringScore">0</div>
+          <div class="ring-unit">SCORE</div>
+        </div>
+      </div>
+      <div class="score-breakdown">
+        <div class="score-row-item">
+          <div class="score-row-label">Tasks</div>
+          <div class="score-micro-bar"><div class="score-micro-fill prog-gold" id="microTask" style="width:0%"></div></div>
+          <div class="score-row-val color-gold" id="microTaskVal">0</div>
+        </div>
+        <div class="score-row-item">
+          <div class="score-row-label">Finance</div>
+          <div class="score-micro-bar"><div class="score-micro-fill prog-emerald" id="microFin" style="width:0%"></div></div>
+          <div class="score-row-val color-emerald" id="microFinVal">0</div>
+        </div>
+        <div class="score-row-item">
+          <div class="score-row-label">Habits</div>
+          <div class="score-micro-bar"><div class="score-micro-fill prog-blue" id="microHab" style="width:0%"></div></div>
+          <div class="score-row-val color-blue" id="microHabVal">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards-stack" style="margin-top:14px">
+
+    <!-- CTA -->
+    <div class="card cta-card" onclick="switchTab('tasks')">
+      <div class="cta-top">
+        <div class="cta-tag">Command Center</div>
+        <div class="cta-arrow">→</div>
+      </div>
+      <div class="cta-title" id="ctaTitle">Start Today's Growth Plan</div>
+      <div class="cta-sub" id="ctaSub">You have no tasks yet. Add one and begin.</div>
+    </div>
+
+    <!-- Quick stats row -->
+    <div class="section-head"><span>Today's Snapshot</span></div>
+    <div class="card mod-card">
+      <div class="stat-pills" style="grid-template-columns:repeat(3,1fr);margin-bottom:0">
+        <div class="stat-pill"><div class="stat-pill-val color-gold" id="ov-tasks">0</div><div class="stat-pill-lbl">Tasks Left</div></div>
+        <div class="stat-pill"><div class="stat-pill-val color-blue" id="ov-habits">0%</div><div class="stat-pill-lbl">Habit Rate</div></div>
+        <div class="stat-pill"><div class="stat-pill-val color-orange" id="ov-learn">0</div><div class="stat-pill-lbl">Skills</div></div>
+      </div>
+    </div>
+
+    <!-- AI Coach -->
+    <div class="section-head"><span>Intelligence Layer</span></div>
+    <div class="card ai-card">
+      <div class="mod-header" style="margin-bottom:12px">
+        <div class="mod-title-wrap">
+          <div class="ai-orb">◈</div>
+          <div>
+            <div class="ai-label">OS Coach · Live</div>
+            <div class="mod-title">Progress Intelligence</div>
+          </div>
+        </div>
+      </div>
+      <p id="aiMessage">System initializing. Add tasks, log finances, and set goals to activate your personal AI coach.</p>
+    </div>
+
+    <div style="height:20px"></div>
+  </div>
+</div><!-- /page-overview -->
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: TASKS + HABITS + GOALS + NOTES
+══════════════════════════════════════════════════ -->
+<div class="page" id="page-tasks">
+  <div class="cards-stack" style="margin-top:16px">
+
+    <!-- GOALS -->
+    <div class="section-head"><span>Goals</span></div>
+    <div class="card mod-card">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon" style="background:rgba(245,180,50,0.1);color:var(--gold)">◎</div>
+          <div class="mod-title">Goal Tracker</div>
+        </div>
+        <div class="mod-badge bg-gold-dim color-gold" id="goalBadge">0 goals</div>
+      </div>
+      <div class="input-group" style="margin-top:0">
+        <input class="os-input" id="goalTitle" type="text" placeholder="Goal title…">
+        <input class="os-input" id="goalDeadline" type="date" style="flex:0.7">
+        <button class="os-btn os-btn-gold" onclick="addGoal()">+</button>
+      </div>
+      <div id="goalList" style="margin-top:12px"></div>
+    </div>
+
+    <!-- TASKS -->
+    <div class="section-head"><span>Task Engine</span></div>
+    <div class="card mod-card">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon bg-gold-dim color-gold">✓</div>
+          <div class="mod-title">Task Manager</div>
+        </div>
+        <div class="mod-badge bg-gold-dim color-gold" id="taskBadge">0 / 0</div>
+      </div>
+      <div class="stat-pills">
+        <div class="stat-pill"><div class="stat-pill-val color-gold" id="totalTasks">0</div><div class="stat-pill-lbl">Total</div></div>
+        <div class="stat-pill"><div class="stat-pill-val color-emerald" id="completedTasks">0</div><div class="stat-pill-lbl">Done</div></div>
+        <div class="stat-pill"><div class="stat-pill-val color-rose" id="remainingTasks">0</div><div class="stat-pill-lbl">Left</div></div>
+      </div>
+      <div class="prog-label"><span>Completion</span><strong id="taskPct">0%</strong></div>
+      <div class="prog-bar"><div class="prog-fill prog-gold" id="taskBar" style="width:0%"></div></div>
+      <div class="input-group" id="taskAnchor">
+        <input class="os-input" id="taskInput" type="text" placeholder="Add a task…">
+        <select class="os-select" id="taskPriority" style="flex:0;min-width:90px">
+          <option value="normal">Normal</option>
+          <option value="high">🔴 High</option>
+          <option value="low">🟢 Low</option>
+        </select>
+        <button class="os-btn os-btn-gold" onclick="addTask()">+ Add</button>
+      </div>
+      <div class="item-list" id="taskList"></div>
+    </div>
+
+    <!-- HABITS -->
+    <div class="section-head"><span>Habit System</span></div>
+    <div class="card mod-card">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon bg-blue-dim color-blue">⟳</div>
+          <div class="mod-title">Habit Tracker</div>
+        </div>
+        <div class="mod-badge bg-blue-dim color-blue" id="habitBadge">0%</div>
+      </div>
+      <div class="prog-label"><span>Today's Rate</span><strong id="habitPct">0%</strong></div>
+      <div class="prog-bar"><div class="prog-fill prog-blue" id="habitBar" style="width:0%"></div></div>
+      <div class="input-group">
+        <input class="os-input" id="habitInput" type="text" placeholder="Add a daily habit…">
+        <button class="os-btn os-btn-blue" onclick="addHabit()">+ Add</button>
+      </div>
+      <div class="item-list" id="habitList"></div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="section-head"><span>Notes</span></div>
+    <div class="card mod-card">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon" style="background:rgba(245,180,50,0.1);color:var(--gold)">✎</div>
+          <div class="mod-title">Quick Notes</div>
+        </div>
+        <div class="mod-badge bg-gold-dim color-gold" id="noteBadge">0 notes</div>
+      </div>
+      <textarea class="os-textarea" id="noteInput" placeholder="Write a note…"></textarea>
+      <div class="input-group" style="margin-top:8px">
+        <button class="os-btn os-btn-gold" onclick="addNote()" style="flex:1">Save Note</button>
+      </div>
+      <div id="noteList" style="margin-top:12px"></div>
+    </div>
+
+    <!-- APPOINTMENTS -->
+    <div class="section-head"><span>Schedule</span></div>
+    <div class="card mod-card">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon" style="background:rgba(245,180,50,0.1);color:var(--gold)">◷</div>
+          <div class="mod-title">Appointments</div>
+        </div>
+        <div class="mod-badge" style="background:var(--gold-dim);color:var(--gold)" id="apptBadge">0 scheduled</div>
+      </div>
+      <div class="input-group">
+        <input class="os-input" id="appointmentTitle" type="text" placeholder="Appointment title">
+      </div>
+      <div class="input-group">
+        <input class="os-input" id="appointmentDate" type="datetime-local">
+        <button class="os-btn os-btn-gold" onclick="addAppointment()">＋</button>
+      </div>
+      <div class="item-list" id="appointmentList"></div>
+    </div>
+
+    <div style="height:20px"></div>
+  </div>
+</div><!-- /page-tasks -->
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: LEARN
+══════════════════════════════════════════════════ -->
+<div class="page" id="page-learn">
+  <div class="cards-stack" style="margin-top:16px">
+
+    <!-- LEARNING PATH -->
+    <div class="section-head"><span>Learning Path</span></div>
+    <div class="card mod-card learning-card">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon bg-purple-dim color-purple">◈</div>
+          <div class="mod-title">Skill Builder</div>
+        </div>
+        <div class="mod-badge bg-purple-dim color-purple" id="skillBadge">0 skills</div>
+      </div>
+
+      <div class="input-group" style="margin-top:0">
+        <input class="os-input" id="skillName" type="text" placeholder="Skill to learn (e.g. Python)">
+        <button class="os-btn os-btn-purple" onclick="addSkill()">+ Add</button>
+      </div>
+      <div id="skillList" style="margin-top:12px"></div>
+    </div>
+
+    <!-- AI LEARNING RECOMMENDATIONS -->
+    <div class="section-head"><span>AI Recommendations</span></div>
+    <div class="card ai-card" style="padding:22px">
+      <div class="mod-header" style="margin-bottom:12px">
+        <div class="mod-title-wrap">
+          <div class="ai-orb">◈</div>
+          <div>
+            <div class="ai-label">Learning Coach</div>
+            <div class="mod-title">Personalized Resources</div>
+          </div>
+        </div>
+        <button class="os-btn os-btn-ghost" onclick="generateLearnRecs()" style="font-size:0.72rem;padding:7px 12px">Generate ✦</button>
+      </div>
+      <div id="learnRecArea">
+        <p style="font-size:0.85rem;color:var(--text-2)">Add skills above, then tap Generate to get AI-curated video, article, and exercise recommendations.</p>
+      </div>
+    </div>
+
+    <!-- RESOURCES LIBRARY -->
+    <div class="section-head"><span>Resource Library</span></div>
+    <div class="card mod-card" style="background:linear-gradient(145deg,rgba(192,132,252,0.04),rgba(255,255,255,0.02));border-color:rgba(192,132,252,0.15)">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon bg-purple-dim color-purple">▶</div>
+          <div class="mod-title">Curated Resources</div>
+        </div>
+      </div>
+      <div id="resourceLibrary">
+        <a class="resource-item" href="https://www.youtube.com/results?search_query=learn+programming+beginner" target="_blank">
+          <div class="resource-icon">▶</div>
+          <div class="resource-body">
+            <div class="resource-title">Programming for Beginners</div>
+            <div class="resource-type">YouTube · Video Series</div>
+          </div>
+          <div class="resource-badge">Free</div>
+        </a>
+        <a class="resource-item" href="https://www.coursera.org" target="_blank">
+          <div class="resource-icon">📖</div>
+          <div class="resource-body">
+            <div class="resource-title">Coursera – Professional Certificates</div>
+            <div class="resource-type">Website · Courses</div>
+          </div>
+          <div class="resource-badge">Freemium</div>
+        </a>
+        <a class="resource-item" href="https://www.khanacademy.org" target="_blank">
+          <div class="resource-icon">✦</div>
+          <div class="resource-body">
+            <div class="resource-title">Khan Academy – Any Subject</div>
+            <div class="resource-type">Website · Interactive</div>
+          </div>
+          <div class="resource-badge">Free</div>
+        </a>
+      </div>
+    </div>
+
+    <div style="height:20px"></div>
+  </div>
+</div><!-- /page-learn -->
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: CAREER
+══════════════════════════════════════════════════ -->
+<div class="page" id="page-career">
+  <div class="cards-stack" style="margin-top:16px">
+
+    <!-- CV BUILDER -->
+    <div class="section-head"><span>CV Builder</span></div>
+    <div class="card mod-card cv-card">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon bg-blue-dim color-blue">📄</div>
+          <div class="mod-title">Resume Builder</div>
+        </div>
+        <button class="os-btn os-btn-blue" onclick="downloadCV()" style="font-size:0.7rem;padding:6px 12px">Export CV</button>
+      </div>
+
+      <div class="input-group" style="margin-top:0">
+        <input class="os-input" id="cvRole" type="text" placeholder="Job title / Role">
+        <input class="os-input" id="cvCompany" type="text" placeholder="Company / School">
+      </div>
+      <div class="input-group">
+        <input class="os-input" id="cvYear" type="text" placeholder="Year (e.g. 2023–2025)">
+        <select class="os-select" id="cvType" style="flex:0.8">
+          <option value="work">💼 Work</option>
+          <option value="edu">🎓 Education</option>
+          <option value="cert">🏆 Certificate</option>
+        </select>
+        <button class="os-btn os-btn-blue" onclick="addCVEntry()">+</button>
+      </div>
+
+      <!-- Skills chips -->
+      <div style="margin-top:14px">
+        <div class="prog-label" style="margin-bottom:8px"><span>Skills</span></div>
+        <div id="skillChips" style="min-height:32px"></div>
+        <div class="input-group" style="margin-top:8px">
+          <input class="os-input" id="cvSkill" type="text" placeholder="Add skill…">
+          <button class="os-btn os-btn-blue" onclick="addCVSkill()">+ Skill</button>
+        </div>
+      </div>
+      <div id="cvList" style="margin-top:14px"></div>
+    </div>
+
+    <!-- SKILL GAP ANALYSIS -->
+    <div class="section-head"><span>Skill Gap Analysis</span></div>
+    <div class="card ai-card" style="padding:22px">
+      <div class="mod-header" style="margin-bottom:12px">
+        <div class="mod-title-wrap">
+          <div class="ai-orb">◈</div>
+          <div>
+            <div class="ai-label">Career AI</div>
+            <div class="mod-title">Skill Gap Analysis</div>
+          </div>
+        </div>
+        <button class="os-btn os-btn-ghost" onclick="analyzeSkillGap()" style="font-size:0.72rem;padding:7px 12px">Analyse ✦</button>
+      </div>
+      <div class="input-group" style="margin-top:0;margin-bottom:12px">
+        <input class="os-input" id="targetRole" type="text" placeholder="Target job role (e.g. Data Analyst)">
+      </div>
+      <div id="skillGapArea"><p style="font-size:0.85rem;color:var(--text-2)">Enter your target role and tap Analyse to get a skill gap breakdown and learning recommendations.</p></div>
+    </div>
+
+    <!-- INTERVIEW PREP -->
+    <div class="section-head"><span>Interview Preparation</span></div>
+    <div class="card mod-card" style="background:linear-gradient(145deg,rgba(77,166,255,0.04),rgba(255,255,255,0.02));border-color:rgba(77,166,255,0.15)">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon bg-blue-dim color-blue">❓</div>
+          <div class="mod-title">Interview Coach</div>
+        </div>
+        <button class="os-btn os-btn-blue" onclick="generateInterviewQs()" style="font-size:0.72rem;padding:7px 12px">Generate ✦</button>
+      </div>
+      <div class="input-group" style="margin-top:0;margin-bottom:12px">
+        <input class="os-input" id="interviewRole" type="text" placeholder="Role for interview prep…">
+      </div>
+      <div id="interviewList"><div class="empty-state">Enter a role and tap Generate for AI interview questions.</div></div>
+    </div>
+
+    <!-- JOB RECOMMENDATIONS -->
+    <div class="section-head"><span>Job Recommendations</span></div>
+    <div class="card mod-card" style="background:linear-gradient(145deg,rgba(77,166,255,0.04),rgba(255,255,255,0.02));border-color:rgba(77,166,255,0.15)">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon bg-blue-dim color-blue">💼</div>
+          <div class="mod-title">Job Matches</div>
+        </div>
+        <button class="os-btn os-btn-blue" onclick="generateJobRecs()" style="font-size:0.72rem;padding:7px 12px">Find Jobs ✦</button>
+      </div>
+      <div id="jobList"><div class="empty-state">Add CV skills and tap Find Jobs for AI-matched opportunities.</div></div>
+    </div>
+
+    <div style="height:20px"></div>
+  </div>
+</div><!-- /page-career -->
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: BUSINESS
+══════════════════════════════════════════════════ -->
+<div class="page" id="page-business">
+  <div class="cards-stack" style="margin-top:16px">
+
+    <!-- BUSINESS IDEAS -->
+    <div class="section-head"><span>Business Ideas</span></div>
+    <div class="card mod-card business-card">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon bg-orange-dim color-orange">💡</div>
+          <div class="mod-title">Idea Generator</div>
+        </div>
+        <button class="os-btn os-btn-orange" onclick="generateIdeas()" style="font-size:0.72rem;padding:7px 12px">Generate ✦</button>
+      </div>
+      <div class="input-group" style="margin-top:0;margin-bottom:0">
+        <input class="os-input" id="ideaInterest" type="text" placeholder="Your interest / skill (e.g. design, coding)">
+      </div>
+      <div id="ideaList" style="margin-top:12px"><div class="empty-state">Enter an interest and tap Generate for AI business ideas.</div></div>
+    </div>
+
+    <!-- MARKETING PLAN -->
+    <div class="section-head"><span>Marketing Plan</span></div>
+    <div class="card mod-card business-card">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon bg-orange-dim color-orange">📣</div>
+          <div class="mod-title">Marketing Builder</div>
+        </div>
+        <button class="os-btn os-btn-orange" onclick="generateMarketing()" style="font-size:0.72rem;padding:7px 12px">Build Plan ✦</button>
+      </div>
+      <div class="input-group" style="margin-top:0;margin-bottom:0">
+        <input class="os-input" id="bizName" type="text" placeholder="Business name or idea">
+      </div>
+      <div id="marketingPlan" style="margin-top:12px"><div class="empty-state">Enter your business and tap Build Plan for a step-by-step marketing strategy.</div></div>
+    </div>
+
+    <!-- FINANCIAL TRACKER -->
+    <div class="section-head"><span>Financial Module</span></div>
+    <div class="card mod-card">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon bg-emerald-dim color-emerald">₦</div>
+          <div class="mod-title">Finance Tracker</div>
+        </div>
+        <div class="mod-badge bg-emerald-dim color-emerald" id="finBadge">Active</div>
+      </div>
+      <div class="balance-display">
+        <div class="balance-label">Current Balance</div>
+        <div class="balance-amount zero" id="balanceTotal">₦0</div>
+      </div>
+      <div class="stat-pills">
+        <div class="stat-pill"><div class="stat-pill-val color-emerald" id="incomeTotal" style="font-size:1rem">₦0</div><div class="stat-pill-lbl">Income</div></div>
+        <div class="stat-pill"><div class="stat-pill-val color-rose" id="expenseTotal" style="font-size:1rem">₦0</div><div class="stat-pill-lbl">Expenses</div></div>
+        <div class="stat-pill"><div class="stat-pill-val color-gold" id="goalDisplay" style="font-size:1rem">₦—</div><div class="stat-pill-lbl">Goal</div></div>
+      </div>
+      <div class="prog-label"><span>Savings Goal</span><strong id="goalPct">—</strong></div>
+      <div class="prog-bar"><div class="prog-fill prog-emerald" id="goalBar" style="width:0%"></div></div>
+      <div class="finance-row" style="margin-top:14px">
+        <div class="finance-col">
+          <input class="os-input" id="incomeInput" type="number" placeholder="Income (₦)">
+          <input class="os-input" id="incomeLabel" type="text" placeholder="Label (e.g. Salary)">
+          <button class="os-btn" style="background:linear-gradient(135deg,#1ab070,var(--emerald));color:#080b10;padding:11px;font-size:0.82rem;border-radius:12px;border:none;font-weight:600;cursor:pointer" onclick="addIncome()">＋ Income</button>
+        </div>
+        <div class="finance-col">
+          <input class="os-input" id="expenseInput" type="number" placeholder="Expense (₦)">
+          <input class="os-input" id="expenseLabel" type="text" placeholder="Label (e.g. Rent)">
+          <button class="os-btn os-btn-rose" style="padding:11px;font-size:0.82rem;border-radius:12px" onclick="addExpense()">－ Expense</button>
+        </div>
+      </div>
+      <div class="input-group" style="margin-top:8px">
+        <input class="os-input" id="goalAmount" type="number" placeholder="Set savings goal (₦)">
+        <button class="os-btn os-btn-gold" onclick="setGoal()">Set</button>
+      </div>
+      <div id="txList" style="margin-top:12px"></div>
+    </div>
+
+    <!-- CRM -->
+    <div class="section-head"><span>Customer Management</span></div>
+    <div class="card mod-card business-card">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon bg-orange-dim color-orange">👥</div>
+          <div class="mod-title">Mini CRM</div>
+        </div>
+        <div class="mod-badge bg-orange-dim color-orange" id="crmBadge">0 contacts</div>
+      </div>
+      <div class="input-group" style="margin-top:0">
+        <input class="os-input" id="crmName" type="text" placeholder="Customer name">
+        <input class="os-input" id="crmStatus" type="text" placeholder="Status (e.g. Lead)">
+        <button class="os-btn os-btn-orange" onclick="addCustomer()">+</button>
+      </div>
+      <div id="customerList" style="margin-top:12px"></div>
+    </div>
+
+    <div style="height:20px"></div>
+  </div>
+</div><!-- /page-business -->
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: FINANCE (standalone deep view)
+══════════════════════════════════════════════════ -->
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: SETTINGS / AI COACH
+══════════════════════════════════════════════════ -->
+<div class="page" id="page-more">
+  <div class="cards-stack" style="margin-top:16px">
+
+    <!-- AI ASSISTANT -->
+    <div class="section-head"><span>AI Assistant</span></div>
+    <div class="card ai-card" style="padding:22px">
+      <div class="mod-header" style="margin-bottom:12px">
+        <div class="mod-title-wrap">
+          <div class="ai-orb">◈</div>
+          <div>
+            <div class="ai-label">Progress AI · Live</div>
+            <div class="mod-title">Your Personal Assistant</div>
+          </div>
+        </div>
+      </div>
+      <div id="chatHistory" style="min-height:60px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px"></div>
+      <div class="input-group" style="margin-top:0">
+        <input class="os-input" id="chatInput" type="text" placeholder="Ask anything about your progress…">
+        <button class="os-btn os-btn-blue" onclick="sendChat()">Send</button>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="section-head"><span>System</span></div>
+    <div class="card mod-card">
+      <div class="mod-header">
+        <div class="mod-title-wrap">
+          <div class="mod-icon" style="background:rgba(255,255,255,0.06);color:var(--text-2)">⚙</div>
+          <div class="mod-title">Settings</div>
+        </div>
+      </div>
+      <div class="settings-row">
+        <button class="os-btn os-btn-ghost" onclick="toggleTheme()">☀ Light / Dark</button>
+        <button class="os-btn os-btn-ghost" onclick="exportData()">⬇ Export Data</button>
+      </div>
+      <div class="settings-row" style="margin-top:8px">
+        <button class="os-btn os-btn-ghost" onclick="resetAll()" style="grid-column:span 2;color:var(--rose);border-color:rgba(255,107,138,0.2)">⚠ Reset All Data</button>
+      </div>
+    </div>
+
+    <div style="height:20px"></div>
+  </div>
+</div><!-- /page-more -->
+
+</div><!-- /shell -->
+
+<!-- ═══ BOTTOM NAV (7 tabs) ═══ -->
+<div class="bottom-nav">
+  <div class="nav-pills">
+    <button class="nav-pill active" id="nav-overview" onclick="switchTab('overview')">
+      <span class="nav-pill-icon">◈</span>
+      <span class="nav-pill-lbl">Overview</span>
+    </button>
+    <button class="nav-pill" id="nav-tasks" onclick="switchTab('tasks')">
+      <span class="nav-pill-icon">✓</span>
+      <span class="nav-pill-lbl">Tasks</span>
+    </button>
+    <button class="nav-pill" id="nav-learn" onclick="switchTab('learn')">
+      <span class="nav-pill-icon">◈</span>
+      <span class="nav-pill-lbl">Learn</span>
+    </button>
+    <button class="nav-pill" id="nav-career" onclick="switchTab('career')">
+      <span class="nav-pill-icon">💼</span>
+      <span class="nav-pill-lbl">Career</span>
+    </button>
+    <button class="nav-pill" id="nav-business" onclick="switchTab('business')">
+      <span class="nav-pill-icon">💡</span>
+      <span class="nav-pill-lbl">Business</span>
+    </button>
+    <button class="nav-pill" id="nav-more" onclick="switchTab('more')">
+      <span class="nav-pill-icon">◆</span>
+      <span class="nav-pill-lbl">AI / More</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCRIPT
+═══════════════════════════════════════════ -->
+<script>
+/* ── Helpers ── */
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function fmtMoney(n){ return "₦"+Number(n).toLocaleString(); }
+function fmtDate(s){ if(!s) return ""; return new Date(s).toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function fmtDateShort(s){ if(!s) return ""; return new Date(s).toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'}); }
+
+/* ── Tab System ── */
+function switchTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  document.getElementById('nav-' + tab).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ── Profile ── */
+let userName = localStorage.getItem("userName") || "";
+function onNameInput(){
+  const v = document.getElementById("userName").value.trim();
+  document.getElementById("avatarLetter").textContent = v ? v[0].toUpperCase() : "?";
+}
+function saveProfile(){
+  const v = document.getElementById("userName").value.trim();
+  if(!v) return;
+  userName = v;
+  localStorage.setItem("userName", v);
+  updateCTA();
+}
+function loadProfile(){
+  if(userName){
+    document.getElementById("userName").value = userName;
+    document.getElementById("avatarLetter").textContent = userName[0].toUpperCase();
+  }
+}
+
+/* ── Goals ── */
+let goals = JSON.parse(localStorage.getItem("goals")) || [];
+function saveGoals(){ localStorage.setItem("goals", JSON.stringify(goals)); }
+function addGoal(){
+  const t = document.getElementById("goalTitle").value.trim();
+  const d = document.getElementById("goalDeadline").value;
+  if(!t) return;
+  goals.push({title:t, deadline:d, progress:0});
+  document.getElementById("goalTitle").value = "";
+  document.getElementById("goalDeadline").value = "";
+  renderGoals();
+}
+function updateGoalProgress(i, val){
+  goals[i].progress = Math.min(100, Math.max(0, Number(val)));
+  saveGoals(); renderGoals();
+}
+function deleteGoal(i){ goals.splice(i,1); saveGoals(); renderGoals(); }
+function renderGoals(){
+  const list = document.getElementById("goalList");
+  document.getElementById("goalBadge").textContent = goals.length + " goals";
+  list.innerHTML = "";
+  if(!goals.length){ list.innerHTML='<div class="empty-state">No goals yet · add one above</div>'; return; }
+  goals.forEach((g,i)=>{
+    const el = document.createElement("div");
+    el.className = "goal-item";
+    el.innerHTML = `
+      <div class="goal-header">
+        <div class="goal-title">${esc(g.title)}</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${g.deadline ? `<div class="goal-deadline">⏱ ${fmtDateShort(g.deadline)}</div>` : ''}
+          <button class="del-btn" onclick="deleteGoal(${i})">✕</button>
+        </div>
+      </div>
+      <div class="goal-pct-label"><span>Progress</span><strong>${g.progress}%</strong></div>
+      <div class="prog-bar"><div class="prog-fill prog-gold" style="width:${g.progress}%"></div></div>
+      <div class="goal-edit-row">
+        <input type="range" min="0" max="100" value="${g.progress}" oninput="updateGoalProgress(${i},this.value)" style="flex:1;accent-color:var(--gold)">
+      </div>`;
+    list.appendChild(el);
+  });
+  saveGoals();
+}
+
+/* ── Tasks ── */
+let tasks = JSON.parse(localStorage.getItem("progressTasks")) || [];
+function saveTasks(){ localStorage.setItem("progressTasks", JSON.stringify(tasks)); }
+function renderTasks(){
+  const list = document.getElementById("taskList");
+  const total = tasks.length, done = tasks.filter(t=>t.done).length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById("totalTasks").textContent     = total;
+  document.getElementById("completedTasks").textContent = done;
+  document.getElementById("remainingTasks").textContent = total - done;
+  document.getElementById("taskBadge").textContent      = `${done} / ${total}`;
+  document.getElementById("taskPct").textContent        = pct + "%";
+  document.getElementById("taskBar").style.width        = pct + "%";
+  document.getElementById("ov-tasks").textContent       = total - done;
+  list.innerHTML = "";
+  if(!tasks.length){ list.innerHTML='<div class="empty-state">No tasks · add one above</div>'; }
+  else {
+    tasks.forEach((t,i)=>{
+      const el = document.createElement("div");
+      el.className = "list-item";
+      const pri = t.priority === 'high' ? '🔴 ' : t.priority === 'low' ? '🟢 ' : '';
+      el.innerHTML = `
+        <button class="check-btn ${t.done?'checked':''}" onclick="toggleTask(${i})">${t.done?'✓':'○'}</button>
+        <span class="list-item-text ${t.done?'done':''}">${pri}${esc(t.text)}</span>
+        <button class="del-btn" onclick="deleteTask(${i})">✕</button>`;
+      list.appendChild(el);
+    });
+  }
+  saveTasks(); updateLifeProgress();
+}
+function addTask(){
+  const inp = document.getElementById("taskInput");
+  const txt = inp.value.trim();
+  if(!txt) return;
+  const priority = document.getElementById("taskPriority").value;
+  tasks.push({text:txt, done:false, priority});
+  inp.value=""; renderTasks();
+}
+function toggleTask(i){ tasks[i].done=!tasks[i].done; renderTasks(); }
+function deleteTask(i){ tasks.splice(i,1); renderTasks(); }
+document.getElementById("taskInput").addEventListener("keydown",e=>{ if(e.key==="Enter") addTask(); });
+
+/* ── Habits ── */
+let habits = JSON.parse(localStorage.getItem("habits")) || [];
+function saveHabits(){ localStorage.setItem("habits", JSON.stringify(habits)); }
+function renderHabits(){
+  const list = document.getElementById("habitList");
+  const total = habits.length, done = habits.filter(h=>h.done).length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById("habitPct").textContent   = pct + "%";
+  document.getElementById("habitBadge").textContent = pct + "%";
+  document.getElementById("habitBar").style.width   = pct + "%";
+  document.getElementById("ov-habits").textContent  = pct + "%";
+  list.innerHTML = "";
+  if(!habits.length){ list.innerHTML='<div class="empty-state">No habits · add one above</div>'; }
+  else {
+    habits.forEach((h,i)=>{
+      const el = document.createElement("div");
+      el.className = "list-item";
+      el.innerHTML = `
+        <button class="check-btn ${h.done?'checked':''}" onclick="toggleHabit(${i})">${h.done?'✓':'○'}</button>
+        <span class="list-item-text ${h.done?'done':''}">${esc(h.name)}</span>
+        <button class="del-btn" onclick="deleteHabit(${i})">✕</button>`;
+      list.appendChild(el);
+    });
+  }
+  saveHabits(); updateLifeProgress();
+}
+function addHabit(){
+  const inp = document.getElementById("habitInput");
+  const txt = inp.value.trim();
+  if(!txt) return;
+  habits.push({name:txt, done:false});
+  inp.value=""; renderHabits();
+}
+function toggleHabit(i){ habits[i].done=!habits[i].done; renderHabits(); }
+function deleteHabit(i){ habits.splice(i,1); renderHabits(); }
+document.getElementById("habitInput").addEventListener("keydown",e=>{ if(e.key==="Enter") addHabit(); });
+
+/* ── Notes ── */
+let notes = JSON.parse(localStorage.getItem("notes")) || [];
+function saveNotes(){ localStorage.setItem("notes", JSON.stringify(notes)); }
+function addNote(){
+  const txt = document.getElementById("noteInput").value.trim();
+  if(!txt) return;
+  notes.unshift({text:txt, date: new Date().toISOString()});
+  document.getElementById("noteInput").value = "";
+  renderNotes();
+}
+function deleteNote(i){ notes.splice(i,1); saveNotes(); renderNotes(); }
+function renderNotes(){
+  const list = document.getElementById("noteList");
+  document.getElementById("noteBadge").textContent = notes.length + " notes";
+  list.innerHTML = "";
+  if(!notes.length){ list.innerHTML='<div class="empty-state">No notes yet</div>'; saveNotes(); return; }
+  notes.forEach((n,i)=>{
+    const el = document.createElement("div");
+    el.className = "note-item";
+    el.innerHTML = `
+      <div class="note-text">${esc(n.text)}</div>
+      <div class="note-date">${fmtDate(n.date)}</div>
+      <div class="note-actions"><button class="del-btn" onclick="deleteNote(${i})">Delete</button></div>`;
+    list.appendChild(el);
+  });
+  saveNotes();
+}
+
+/* ── Finance ── */
+let income   = Number(localStorage.getItem("income"))   || 0;
+let expenses = Number(localStorage.getItem("expenses")) || 0;
+let finGoal  = Number(localStorage.getItem("finGoal"))  || 0;
+let txs      = JSON.parse(localStorage.getItem("txs"))  || [];
+function saveFinance(){ localStorage.setItem("income",income); localStorage.setItem("expenses",expenses); localStorage.setItem("finGoal",finGoal); localStorage.setItem("txs",JSON.stringify(txs)); }
+function updateFinance(){
+  const bal = income - expenses;
+  document.getElementById("incomeTotal").textContent  = fmtMoney(income);
+  document.getElementById("expenseTotal").textContent = fmtMoney(expenses);
+  document.getElementById("goalDisplay").textContent  = finGoal ? fmtMoney(finGoal) : "₦—";
+  const balEl = document.getElementById("balanceTotal");
+  balEl.textContent = fmtMoney(bal);
+  balEl.className = "balance-amount " + (bal>0?"pos":bal<0?"neg":"zero");
+  if(finGoal > 0){
+    const pct = Math.min(Math.max((bal/finGoal)*100, 0), 100);
+    document.getElementById("goalBar").style.width = pct + "%";
+    document.getElementById("goalPct").textContent = pct.toFixed(1) + "%";
+  } else {
+    document.getElementById("goalPct").textContent = "—";
+    document.getElementById("goalBar").style.width = "0%";
+  }
+  renderTxs();
+  saveFinance(); updateLifeProgress();
+}
+function renderTxs(){
+  const list = document.getElementById("txList");
+  if(!txs.length){ list.innerHTML=''; return; }
+  list.innerHTML = txs.slice(0,6).map((t,i)=>`
+    <div class="list-item">
+      <span style="font-size:1rem">${t.type==='income'?'↑':'↓'}</span>
+      <span class="list-item-text">${esc(t.label||t.type)}</span>
+      <span class="list-item-meta ${t.type==='income'?'color-emerald':'color-rose'}">${fmtMoney(t.amount)}</span>
+      <button class="del-btn" onclick="deleteTx(${i})">✕</button>
+    </div>`).join('');
+}
+function deleteTx(i){
+  const t = txs[i];
+  if(t.type==='income') income -= t.amount;
+  else expenses -= t.amount;
+  txs.splice(i,1);
+  updateFinance();
+}
+function addIncome(){
+  const v = Number(document.getElementById("incomeInput").value);
+  const lbl = document.getElementById("incomeLabel").value.trim();
+  if(!v||v<=0) return;
+  income += v;
+  txs.unshift({type:'income', amount:v, label:lbl||'Income'});
+  document.getElementById("incomeInput").value = "";
+  document.getElementById("incomeLabel").value = "";
+  updateFinance();
+}
+function addExpense(){
+  const v = Number(document.getElementById("expenseInput").value);
+  const lbl = document.getElementById("expenseLabel").value.trim();
+  if(!v||v<=0) return;
+  expenses += v;
+  txs.unshift({type:'expense', amount:v, label:lbl||'Expense'});
+  document.getElementById("expenseInput").value = "";
+  document.getElementById("expenseLabel").value = "";
+  updateFinance();
+}
+function setGoal(){
+  const v = Number(document.getElementById("goalAmount").value);
+  if(!v||v<=0) return;
+  finGoal = v;
+  document.getElementById("goalAmount").value = "";
+  updateFinance();
+}
+
+/* ── Appointments ── */
+let appointments = JSON.parse(localStorage.getItem("appointments")) || [];
+function saveAppointments(){ localStorage.setItem("appointments", JSON.stringify(appointments)); }
+function renderAppointments(){
+  const list = document.getElementById("appointmentList");
+  document.getElementById("apptBadge").textContent = appointments.length + " scheduled";
+  list.innerHTML = "";
+  if(!appointments.length){ list.innerHTML='<div class="empty-state">No appointments scheduled</div>'; saveAppointments(); return; }
+  appointments.forEach((a,i)=>{
+    const el = document.createElement("div");
+    el.className = "appt-item";
+    el.innerHTML = `
+      <div class="appt-dot-col"><div class="appt-dot"></div>${i<appointments.length-1?'<div class="appt-line"></div>':''}</div>
+      <div class="appt-body">
+        <div class="appt-title">${esc(a.title)}</div>
+        <div class="appt-time">${fmtDate(a.date)}</div>
+      </div>
+      <button class="del-btn" onclick="deleteAppointment(${i})">✕</button>`;
+    list.appendChild(el);
+  });
+  saveAppointments();
+}
+function addAppointment(){
+  const title = document.getElementById("appointmentTitle").value.trim();
+  const date  = document.getElementById("appointmentDate").value;
+  if(!title||!date) return;
+  appointments.push({title,date});
+  appointments.sort((a,b)=>new Date(a.date)-new Date(b.date));
+  document.getElementById("appointmentTitle").value = "";
+  document.getElementById("appointmentDate").value  = "";
+  renderAppointments();
+}
+function deleteAppointment(i){ appointments.splice(i,1); renderAppointments(); }
+
+/* ── Skills (Learning) ── */
+let skills = JSON.parse(localStorage.getItem("skills")) || [];
+function saveSkills(){ localStorage.setItem("skills", JSON.stringify(skills)); }
+function addSkill(){
+  const name = document.getElementById("skillName").value.trim();
+  if(!name) return;
+  skills.push({name, progress:0});
+  document.getElementById("skillName").value = "";
+  renderSkills();
+}
+function updateSkillProg(i, val){
+  skills[i].progress = Number(val);
+  saveSkills(); renderSkills();
+}
+function deleteSkill(i){ skills.splice(i,1); saveSkills(); renderSkills(); }
+function renderSkills(){
+  const list = document.getElementById("skillList");
+  document.getElementById("skillBadge").textContent = skills.length + " skills";
+  document.getElementById("ov-learn").textContent = skills.length;
+  list.innerHTML = "";
+  if(!skills.length){ list.innerHTML='<div class="empty-state">No skills yet · add one above</div>'; return; }
+  skills.forEach((s,i)=>{
+    const el = document.createElement("div");
+    el.className = "skill-prog";
+    el.innerHTML = `
+      <div class="skill-prog-label">
+        <strong>${esc(s.name)}</strong>
+        <span>${s.progress}%</span>
+      </div>
+      <div class="prog-bar" style="height:8px"><div class="prog-fill prog-purple" style="width:${s.progress}%"></div></div>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+        <input type="range" min="0" max="100" value="${s.progress}" oninput="updateSkillProg(${i},this.value)" style="flex:1;accent-color:var(--purple)">
+        <button class="del-btn" onclick="deleteSkill(${i})">✕</button>
+      </div>`;
+    list.appendChild(el);
+  });
+  saveSkills();
+}
+
+/* ── CV Builder ── */
+let cvEntries = JSON.parse(localStorage.getItem("cvEntries")) || [];
+let cvSkills  = JSON.parse(localStorage.getItem("cvSkills"))  || [];
+function saveCVData(){ localStorage.setItem("cvEntries",JSON.stringify(cvEntries)); localStorage.setItem("cvSkills",JSON.stringify(cvSkills)); }
+function addCVEntry(){
+  const role    = document.getElementById("cvRole").value.trim();
+  const company = document.getElementById("cvCompany").value.trim();
+  const year    = document.getElementById("cvYear").value.trim();
+  const type    = document.getElementById("cvType").value;
+  if(!role) return;
+  cvEntries.push({role,company,year,type});
+  document.getElementById("cvRole").value = "";
+  document.getElementById("cvCompany").value = "";
+  document.getElementById("cvYear").value = "";
+  renderCV();
+}
+function addCVSkill(){
+  const s = document.getElementById("cvSkill").value.trim();
+  if(!s||cvSkills.includes(s)) return;
+  cvSkills.push(s);
+  document.getElementById("cvSkill").value = "";
+  renderCV();
+}
+function deleteCVEntry(i){ cvEntries.splice(i,1); saveCVData(); renderCV(); }
+function deleteCVSkill(i){ cvSkills.splice(i,1); saveCVData(); renderCV(); }
+function renderCV(){
+  const list = document.getElementById("cvList");
+  const chips = document.getElementById("skillChips");
+  chips.innerHTML = cvSkills.map((s,i)=>`<span class="skill-chip">${esc(s)} <span onclick="deleteCVSkill(${i})" style="cursor:pointer;opacity:0.6">✕</span></span>`).join('');
+  list.innerHTML = "";
+  const icons = {work:'💼', edu:'🎓', cert:'🏆'};
+  cvEntries.forEach((e,i)=>{
+    const el = document.createElement("div");
+    el.className = "cv-entry";
+    el.innerHTML = `
+      <div class="cv-bullet">${icons[e.type]||'💼'}</div>
+      <div class="cv-body">
+        <div class="cv-role">${esc(e.role)}</div>
+        <div class="cv-meta">${esc(e.company)} ${e.year?'· '+esc(e.year):''}</div>
+      </div>
+      <button class="del-btn" onclick="deleteCVEntry(${i})">✕</button>`;
+    list.appendChild(el);
+  });
+  saveCVData();
+}
+function downloadCV(){
+  const n = userName || "My";
+  const lines = [`${n}'s CV\n${'─'.repeat(40)}\n`];
+  if(cvSkills.length) lines.push(`SKILLS\n${cvSkills.join(', ')}\n`);
+  const order = ['work','edu','cert'];
+  const labels = {work:'WORK EXPERIENCE',edu:'EDUCATION',cert:'CERTIFICATES'};
+  order.forEach(t=>{
+    const items = cvEntries.filter(e=>e.type===t);
+    if(items.length){
+      lines.push(labels[t]);
+      items.forEach(e=>lines.push(`  ${e.role}${e.company?' at '+e.company:''} ${e.year||''}`));
+      lines.push('');
+    }
+  });
+  const blob = new Blob([lines.join('\n')],{type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${n.replace(/\s+/g,'_')}_CV.txt`;
+  a.click();
+}
+
+/* ── Customers (CRM) ── */
+let customers = JSON.parse(localStorage.getItem("customers")) || [];
+function saveCustomers(){ localStorage.setItem("customers", JSON.stringify(customers)); }
+function addCustomer(){
+  const name   = document.getElementById("crmName").value.trim();
+  const status = document.getElementById("crmStatus").value.trim();
+  if(!name) return;
+  customers.push({name, status:status||'Contact'});
+  document.getElementById("crmName").value = "";
+  document.getElementById("crmStatus").value = "";
+  renderCustomers();
+}
+function deleteCustomer(i){ customers.splice(i,1); saveCustomers(); renderCustomers(); }
+function renderCustomers(){
+  const list = document.getElementById("customerList");
+  document.getElementById("crmBadge").textContent = customers.length + " contacts";
+  list.innerHTML = "";
+  if(!customers.length){ list.innerHTML='<div class="empty-state">No contacts yet</div>'; saveCustomers(); return; }
+  customers.forEach((c,i)=>{
+    const el = document.createElement("div");
+    el.className = "customer-item";
+    el.innerHTML = `
+      <div class="customer-avatar">${c.name[0].toUpperCase()}</div>
+      <div class="customer-body">
+        <div class="customer-name">${esc(c.name)}</div>
+        <div class="customer-status">${esc(c.status)}</div>
+      </div>
+      <button class="del-btn" onclick="deleteCustomer(${i})">✕</button>`;
+    list.appendChild(el);
+  });
+  saveCustomers();
+}
+
+/* ── Life Score ── */
+function updateLifeProgress(){
+  const tTotal = tasks.length, tDone = tasks.filter(t=>t.done).length;
+  const taskScore = tTotal ? (tDone/tTotal)*34 : 0;
+  const bal = income - expenses;
+  const finScore = finGoal > 0 ? Math.min((bal/finGoal)*33, 33) : 0;
+  const hTotal = habits.length, hDone = habits.filter(h=>h.done).length;
+  const habScore = hTotal ? (hDone/hTotal)*33 : 0;
+  const score = Math.min(Math.max(taskScore+finScore+habScore, 0), 100);
+
+  const circ = 226;
+  document.getElementById("ringFill").style.strokeDashoffset = circ - (circ * score/100);
+  document.getElementById("ringScore").textContent = score.toFixed(0);
+  const tPct = taskScore/34*100, fPct = finScore/33*100, hPct = habScore/33*100;
+  document.getElementById("microTask").style.width  = tPct + "%";
+  document.getElementById("microFin").style.width   = fPct + "%";
+  document.getElementById("microHab").style.width   = hPct + "%";
+  document.getElementById("microTaskVal").textContent = taskScore.toFixed(0);
+  document.getElementById("microFinVal").textContent  = finScore.toFixed(0);
+  document.getElementById("microHabVal").textContent  = habScore.toFixed(0);
+
+  let level = "Beginner", lvlNum = 1;
+  if(score>=80){ level="Elite Performer"; lvlNum=5; }
+  else if(score>=60){ level="High Achiever"; lvlNum=4; }
+  else if(score>=40){ level="Builder"; lvlNum=3; }
+  else if(score>=20){ level="Rising"; lvlNum=2; }
+  document.getElementById("profileLevel").textContent = `Level ${lvlNum} · ${level}`;
+  const momentum = score>=60?"Peak Momentum":score>=30?"Building Momentum":"Getting Started";
+  document.getElementById("momentumStatus").textContent = momentum;
+  updateAI(score, tPct, fPct, hPct, tTotal, hTotal);
+  updateCTA(score, tTotal, tDone);
+}
+
+/* ── AI Coach ── */
+function updateAI(score, tPct, fPct, hPct, tTotal, hTotal){
+  let base;
+  if(score < 20)      base = "System warming up. Add your first task and start tracking—your future self is watching.";
+  else if(score < 40) base = "Early momentum detected. The hardest part is starting, and you've started. Push further.";
+  else if(score < 60) base = "Solid foundation established. You're in execution mode—consistency over the next 7 days will be decisive.";
+  else if(score < 80) base = "High performance trajectory. You're in the top tier. One focused session today could break a new record.";
+  else                base = "Elite performance mode. You are operating at peak capacity. Maintain, then raise the ceiling.";
+  let extra = "";
+  if(tTotal > 0 && tPct < 50) extra += " Prioritize clearing your open tasks.";
+  if(hTotal > 0 && hPct < 50) extra += " Your habit streak needs attention today.";
+  if(fPct >= 80) extra += " Your savings goal is nearly reached—outstanding financial discipline.";
+  document.getElementById("aiMessage").textContent = base + extra;
+}
+
+/* ── CTA ── */
+function updateCTA(score, tTotal, tDone){
+  const title = document.getElementById("ctaTitle");
+  const sub   = document.getElementById("ctaSub");
+  if(!score || score < 1){
+    title.textContent = "Start Today's Growth Plan";
+    sub.textContent   = "Tap to add your first task and activate the system.";
+  } else if(tTotal && tDone === tTotal){
+    title.textContent = "All Tasks Complete 🏆";
+    sub.textContent   = "Exceptional. Now set tomorrow's targets.";
+  } else if(score >= 60){
+    title.textContent = "Continue to Next Level →";
+    sub.textContent   = `Score ${score.toFixed(0)}/100 · Keep the momentum alive.`;
+  } else {
+    title.textContent = "Update Today's Progress";
+    sub.textContent   = `Score ${score.toFixed(0)}/100 · You're building something great.`;
+  }
+}
+
+/* ── AI Calls (Anthropic API) ── */
+async function callAI(prompt) {
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+  const data = await res.json();
+  return data.content?.map(b => b.text || "").join("") || "";
+}
+
+/* ── Learning Recommendations ── */
+async function generateLearnRecs(){
+  const area = document.getElementById("learnRecArea");
+  const skillNames = skills.map(s=>s.name).join(", ");
+  if(!skillNames){ area.innerHTML='<p style="color:var(--text-3);font-size:0.83rem">Add skills above first.</p>'; return; }
+  area.innerHTML = '<div class="ai-typing"><span></span><span></span><span></span></div>';
+  try {
+    const txt = await callAI(`You are a learning coach. The user is learning: ${skillNames}. Give them 4 specific, real resource recommendations — 2 free YouTube channels/playlists, 1 website or course platform, 1 practical exercise. Format as JSON array: [{type:"video|article|exercise", title:"...", url:"...", note:"1 sentence tip"}]. Return ONLY the JSON array, no markdown.`);
+    const clean = txt.replace(/```json|```/g,'').trim();
+    const recs = JSON.parse(clean);
+    area.innerHTML = recs.map(r=>`
+      <a class="resource-item" href="${esc(r.url)}" target="_blank" style="display:flex;gap:12px;align-items:center;padding:11px 13px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;text-decoration:none;color:var(--text)">
+        <div class="resource-icon">${r.type==='video'?'▶':r.type==='exercise'?'✍':'📖'}</div>
+        <div class="resource-body">
+          <div class="resource-title">${esc(r.title)}</div>
+          <div class="resource-type">${esc(r.note)}</div>
+        </div>
+        <div class="resource-badge">${r.type}</div>
+      </a>`).join('');
+  } catch(e) {
+    area.innerHTML = '<p style="color:var(--rose);font-size:0.83rem">Could not generate recommendations. Check connection.</p>';
+  }
+}
+
+/* ── Skill Gap Analysis ── */
+async function analyzeSkillGap(){
+  const role = document.getElementById("targetRole").value.trim();
+  const area = document.getElementById("skillGapArea");
+  if(!role){ area.innerHTML='<p style="color:var(--text-3);font-size:0.83rem">Enter a target role first.</p>'; return; }
+  area.innerHTML = '<div class="ai-typing"><span></span><span></span><span></span></div>';
+  const mySkills = cvSkills.join(", ") || "none listed";
+  try {
+    const txt = await callAI(`You are a career coach. The user wants to become a "${role}". Their current skills: ${mySkills}. Identify the top 5 skills they need for this role. For each skill, estimate how critical it is (0-100%). Format as JSON array: [{skill:"...", importance:80, gap:"high|medium|low", advice:"1 sentence"}]. Return ONLY the JSON array.`);
+    const clean = txt.replace(/```json|```/g,'').trim();
+    const gaps = JSON.parse(clean);
+    const colors = {high:'var(--rose)',medium:'var(--gold)',low:'var(--emerald)'};
+    area.innerHTML = `<p style="font-size:0.78rem;color:var(--text-2);margin-bottom:12px">Skill gap for <strong style="color:var(--text)">${esc(role)}</strong>:</p>` +
+      gaps.map(g=>`
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:5px">
+            <strong>${esc(g.skill)}</strong>
+            <span style="color:${colors[g.gap]||'var(--text-2)'}">${g.gap} gap</span>
+          </div>
+          <div class="prog-bar" style="height:6px"><div class="prog-fill" style="width:${g.importance}%;background:${colors[g.gap]||'var(--blue)'}"></div></div>
+          <div style="font-size:0.72rem;color:var(--text-3);margin-top:5px">${esc(g.advice)}</div>
+        </div>`).join('');
+  } catch(e) {
+    area.innerHTML = '<p style="color:var(--rose);font-size:0.83rem">Analysis failed. Check your connection.</p>';
+  }
+}
+
+/* ── Interview Questions ── */
+async function generateInterviewQs(){
+  const role = document.getElementById("interviewRole").value.trim();
+  const list = document.getElementById("interviewList");
+  if(!role){ list.innerHTML='<div class="empty-state">Enter a role first.</div>'; return; }
+  list.innerHTML = '<div class="ai-typing" style="padding:16px"><span></span><span></span><span></span></div>';
+  try {
+    const txt = await callAI(`Generate 5 common interview questions for a ${role} position. For each, include a concise tip on how to answer well. Format as JSON array: [{question:"...", tip:"2-3 sentence answer tip"}]. Return ONLY the JSON array.`);
+    const clean = txt.replace(/```json|```/g,'').trim();
+    const qs = JSON.parse(clean);
+    list.innerHTML = qs.map((q,i)=>`
+      <div class="interview-q" onclick="this.classList.toggle('open')">
+        <div class="interview-q-text">${i+1}. ${esc(q.question)}</div>
+        <div class="interview-q-toggle">▸ Tap for tip</div>
+        <div class="interview-q-tip">${esc(q.tip)}</div>
+      </div>`).join('');
+  } catch(e) {
+    list.innerHTML = '<div class="empty-state" style="color:var(--rose)">Failed to generate. Try again.</div>';
+  }
+}
+
+/* ── Job Recommendations ── */
+async function generateJobRecs(){
+  const list = document.getElementById("jobList");
+  const mySkills = cvSkills.join(", ");
+  if(!mySkills){ list.innerHTML='<div class="empty-state">Add skills in the CV Builder first.</div>'; return; }
+  list.innerHTML = '<div class="ai-typing" style="padding:16px"><span></span><span></span><span></span></div>';
+  try {
+    const txt = await callAI(`Based on these skills: ${mySkills}, recommend 4 specific job roles with match percentage. Format as JSON: [{role:"...", match:85, reason:"1 sentence", tags:["skill1","skill2"]}]. Return ONLY the JSON array.`);
+    const clean = txt.replace(/```json|```/g,'').trim();
+    const jobs = JSON.parse(clean);
+    list.innerHTML = jobs.map(j=>`
+      <div class="list-item" style="flex-direction:column;align-items:flex-start;gap:8px;padding:14px">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
+          <div style="font-size:0.88rem;font-weight:700">${esc(j.role)}</div>
+          <div class="match-score">${j.match}%</div>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-2)">${esc(j.reason)}</div>
+        <div>${(j.tags||[]).map(t=>`<span class="job-tag">${esc(t)}</span>`).join('')}</div>
+      </div>`).join('');
+  } catch(e) {
+    list.innerHTML = '<div class="empty-state" style="color:var(--rose)">Failed. Try again.</div>';
+  }
+}
+
+/* ── Business Ideas ── */
+async function generateIdeas(){
+  const interest = document.getElementById("ideaInterest").value.trim();
+  const list = document.getElementById("ideaList");
+  if(!interest){ list.innerHTML='<div class="empty-state">Enter an interest first.</div>'; return; }
+  list.innerHTML = '<div class="ai-typing" style="padding:16px"><span></span><span></span><span></span></div>';
+  try {
+    const txt = await callAI(`Generate 3 unique, actionable business ideas for someone interested in: ${interest}. Each idea should be practical and low-capital to start. Format as JSON array: [{title:"...", description:"2-3 sentences", tags:["tag1","tag2"], startupCost:"low|medium|high"}]. Return ONLY the JSON array.`);
+    const clean = txt.replace(/```json|```/g,'').trim();
+    const ideas = JSON.parse(clean);
+    list.innerHTML = ideas.map(idea=>`
+      <div class="idea-item">
+        <div class="idea-title">💡 ${esc(idea.title)}</div>
+        <div class="idea-desc">${esc(idea.description)}</div>
+        <div class="idea-tags">
+          ${(idea.tags||[]).map(t=>`<span class="idea-tag">${esc(t)}</span>`).join('')}
+          <span class="idea-tag">Cost: ${esc(idea.startupCost)}</span>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    list.innerHTML = '<div class="empty-state" style="color:var(--rose)">Failed. Try again.</div>';
+  }
+}
+
+/* ── Marketing Plan ── */
+async function generateMarketing(){
+  const biz = document.getElementById("bizName").value.trim();
+  const plan = document.getElementById("marketingPlan");
+  if(!biz){ plan.innerHTML='<div class="empty-state">Enter a business name first.</div>'; return; }
+  plan.innerHTML = '<div class="ai-typing" style="padding:16px"><span></span><span></span><span></span></div>';
+  try {
+    const txt = await callAI(`Create a practical 5-step marketing plan for: "${biz}". Focus on free/low-cost channels. Format as JSON: [{step:1, title:"...", action:"2 sentence description"}]. Return ONLY the JSON array.`);
+    const clean = txt.replace(/```json|```/g,'').trim();
+    const steps = JSON.parse(clean);
+    plan.innerHTML = steps.map(s=>`
+      <div class="mkt-step">
+        <div class="mkt-num">${s.step}</div>
+        <div>
+          <div style="font-size:0.83rem;font-weight:700;margin-bottom:4px">${esc(s.title)}</div>
+          <div class="mkt-text">${esc(s.action)}</div>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    plan.innerHTML = '<div class="empty-state" style="color:var(--rose)">Failed. Try again.</div>';
+  }
+}
+
+/* ── AI Chat ── */
+let chatHistory = [];
+async function sendChat(){
+  const input = document.getElementById("chatInput");
+  const msg = input.value.trim();
+  if(!msg) return;
+  input.value = "";
+  const histDiv = document.getElementById("chatHistory");
+  // Add user message
+  chatHistory.push({role:"user", content:msg});
+  renderChat();
+  // Show typing
+  const typingEl = document.createElement("div");
+  typingEl.style.cssText="display:flex;justify-content:flex-start;";
+  typingEl.innerHTML='<div style="background:rgba(77,166,255,0.1);border:1px solid rgba(77,166,255,0.2);border-radius:12px;padding:10px 14px"><div class="ai-typing"><span></span><span></span><span></span></div></div>';
+  histDiv.appendChild(typingEl);
+  histDiv.scrollTop = histDiv.scrollHeight;
+  try {
+    const context = `You are Progress-OS AI assistant. User: ${userName||'unknown'}. Tasks: ${tasks.length} (${tasks.filter(t=>t.done).length} done). Habits: ${habits.length}. Balance: ₦${income-expenses}. Skills: ${skills.map(s=>s.name).join(', ')||'none'}.`;
+    const res = await fetch("/api/chat", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        system: context,
+        messages: chatHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.map(b=>b.text||"").join("") || "Sorry, I couldn't respond.";
+    chatHistory.push({role:"assistant", content:reply});
+  } catch(e) {
+    chatHistory.push({role:"assistant", content:"Connection error. Please try again."});
+  }
+  histDiv.removeChild(typingEl);
+  renderChat();
+}
+function renderChat(){
+  const histDiv = document.getElementById("chatHistory");
+  histDiv.innerHTML = chatHistory.map(m=>`
+    <div style="display:flex;justify-content:${m.role==='user'?'flex-end':'flex-start'}">
+      <div style="max-width:85%;background:${m.role==='user'?'var(--gold-dim)':'rgba(77,166,255,0.1)'};border:1px solid ${m.role==='user'?'rgba(245,180,50,0.25)':'rgba(77,166,255,0.2)'};border-radius:14px;padding:10px 14px;font-size:0.83rem;line-height:1.55">
+        ${esc(m.content)}
+      </div>
+    </div>`).join('');
+  histDiv.scrollTop = histDiv.scrollHeight;
+}
+document.getElementById("chatInput").addEventListener("keydown",e=>{ if(e.key==="Enter") sendChat(); });
+
+/* ── Theme ── */
+function toggleTheme(){
+  document.body.classList.toggle("light-mode");
+  localStorage.setItem("theme", document.body.classList.contains("light-mode") ? "light" : "dark");
+}
+function loadTheme(){
+  if(localStorage.getItem("theme") === "light") document.body.classList.add("light-mode");
+}
+
+/* ── Export ── */
+function exportData(){
+  const data = {tasks, appointments, habits, income, expenses, goal:finGoal, userName, notes, goals, skills, cvEntries, cvSkills, customers, txs};
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "progress-os-data.json";
+  a.click();
+}
+
+/* ── Reset ── */
+function resetAll(){
+  if(!confirm("Reset ALL data? This cannot be undone.")) return;
+  localStorage.clear();
+  location.reload();
+}
+
+/* ── Init ── */
+loadTheme();
+loadProfile();
+renderGoals();
+renderTasks();
+renderHabits();
+renderNotes();
+updateFinance();
+renderAppointments();
+renderSkills();
+renderCV();
+renderCustomers();
+updateLifeProgress();
+</script>
+</body>
+</html>
