@@ -15,15 +15,13 @@ export default async function handler(req) {
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
-  
-  // Debug: check if key exists
   if (!apiKey) {
-    return new Response(JSON.stringify({ text: "", error: "NO_API_KEY - key not found in environment" }), { status: 200, headers });
+    return new Response(JSON.stringify({ text: "", error: "No API key" }), { status: 200, headers });
   }
 
   try {
     const body = await req.json();
-    const { messages, system, max_tokens = 800 } = body;
+    const { messages, system } = body;
 
     const fullMessages = system
       ? [{ role: "system", content: system }, ...messages]
@@ -37,21 +35,22 @@ export default async function handler(req) {
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        max_tokens,
+        max_tokens: 1500,
         messages: fullMessages,
       }),
     });
 
-    const data = await response.json();
-    
+    const text = await response.text();
+    const data = JSON.parse(text);
+
     if (!response.ok) {
       return new Response(JSON.stringify({ text: "", error: JSON.stringify(data) }), { status: 200, headers });
     }
 
-    const text = data.choices?.[0]?.message?.content || "";
-    return new Response(JSON.stringify({ text }), { status: 200, headers });
+    const result = data.choices?.[0]?.message?.content || "";
+    return new Response(JSON.stringify({ text: result }), { status: 200, headers });
 
   } catch (err) {
-    return new Response(JSON.stringify({ text: "", error: "CATCH: " + err.message }), { status: 200, headers });
+    return new Response(JSON.stringify({ text: "", error: err.message }), { status: 200, headers });
   }
 }
