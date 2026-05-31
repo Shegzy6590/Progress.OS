@@ -1399,6 +1399,17 @@ button { font-family: var(--body); }
           <div class="mod-title">Settings</div>
         </div>
       </div>
+
+      <!-- Gemini API Key input -->
+      <div style="margin-bottom:14px">
+        <div class="prog-label" style="margin-bottom:8px"><span>Gemini API Key (free)</span></div>
+        <div class="input-group" style="margin-top:0">
+          <input class="os-input" id="geminiKeyInput" type="password" placeholder="Paste your AIza... key here">
+          <button class="os-btn os-btn-emerald" onclick="saveGeminiKey()">Save</button>
+        </div>
+        <div id="keyStatus" style="font-size:0.72rem;margin-top:6px;color:var(--text-3)">Get free key at aistudio.google.com</div>
+      </div>
+
       <div class="settings-row">
         <button class="os-btn os-btn-ghost" onclick="toggleTheme()">☀ Light / Dark</button>
         <button class="os-btn os-btn-ghost" onclick="exportData()">⬇ Export Data</button>
@@ -1555,6 +1566,7 @@ function renderTasks(){
     });
   }
   saveTasks(); updateLifeProgress();
+loadGeminiKey();
 }
 function addTask(){
   const inp = document.getElementById("taskInput");
@@ -1593,6 +1605,7 @@ function renderHabits(){
     });
   }
   saveHabits(); updateLifeProgress();
+loadGeminiKey();
 }
 function addHabit(){
   const inp = document.getElementById("habitInput");
@@ -1657,6 +1670,7 @@ function updateFinance(){
   }
   renderTxs();
   saveFinance(); updateLifeProgress();
+loadGeminiKey();
 }
 function renderTxs(){
   const list = document.getElementById("txList");
@@ -2177,6 +2191,25 @@ function resetAll(){
   location.reload();
 }
 
+/* ── Gemini Key ── */
+function saveGeminiKey(){
+  const k = document.getElementById("geminiKeyInput").value.trim();
+  if(!k){ document.getElementById("keyStatus").textContent = "Please enter a key"; return; }
+  window._gk = k;
+  localStorage.setItem("gk", k);
+  document.getElementById("keyStatus").textContent = "✓ Key saved! AI features ready.";
+  document.getElementById("keyStatus").style.color = "var(--emerald)";
+}
+function loadGeminiKey(){
+  const k = localStorage.getItem("gk");
+  if(k){
+    window._gk = k;
+    document.getElementById("geminiKeyInput").value = k;
+    document.getElementById("keyStatus").textContent = "✓ Key loaded. AI ready.";
+    document.getElementById("keyStatus").style.color = "var(--emerald)";
+  }
+}
+
 /* ── Init ── */
 loadTheme();
 loadProfile();
@@ -2190,6 +2223,7 @@ renderSkills();
 renderCV();
 renderCustomers();
 updateLifeProgress();
+loadGeminiKey();
 </script>
 </body>
 </html>
