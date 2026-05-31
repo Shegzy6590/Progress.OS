@@ -1978,7 +1978,7 @@ async function generateLearnRecs(){
         <div class="resource-badge">${r.type}</div>
       </a>`).join('');
   } catch(e) {
-    area.innerHTML = '<p style="color:var(--rose);font-size:0.83rem">Could not generate recommendations. Check connection.</p>';
+    area.innerHTML = '<p style="color:var(--rose);font-size:0.83rem">Error: ' + e.message + '</p>';
   }
 }
 
@@ -2005,7 +2005,7 @@ async function analyzeSkillGap(){
           <div style="font-size:0.72rem;color:var(--text-3);margin-top:5px">${esc(g.advice)}</div>
         </div>`).join('');
   } catch(e) {
-    area.innerHTML = '<p style="color:var(--rose);font-size:0.83rem">Analysis failed. Check your connection.</p>';
+    area.innerHTML = '<p style="color:var(--rose);font-size:0.83rem">Error: ' + e.message + '</p>';
   }
 }
 
@@ -2026,7 +2026,7 @@ async function generateInterviewQs(){
         <div class="interview-q-tip">${esc(q.tip)}</div>
       </div>`).join('');
   } catch(e) {
-    list.innerHTML = '<div class="empty-state" style="color:var(--rose)">Failed to generate. Try again.</div>';
+    list.innerHTML = '<div class="empty-state" style="color:var(--rose)">Error: ' + e.message + '</div>';
   }
 }
 
@@ -2050,7 +2050,7 @@ async function generateJobRecs(){
         <div>${(j.tags||[]).map(t=>`<span class="job-tag">${esc(t)}</span>`).join('')}</div>
       </div>`).join('');
   } catch(e) {
-    list.innerHTML = '<div class="empty-state" style="color:var(--rose)">Failed. Try again.</div>';
+    list.innerHTML = '<div class="empty-state" style="color:var(--rose)">Error: ' + e.message + '</div>';
   }
 }
 
@@ -2074,7 +2074,7 @@ async function generateIdeas(){
         </div>
       </div>`).join('');
   } catch(e) {
-    list.innerHTML = '<div class="empty-state" style="color:var(--rose)">Failed. Try again.</div>';
+    list.innerHTML = '<div class="empty-state" style="color:var(--rose)">Error: ' + e.message + '</div>';
   }
 }
 
@@ -2097,7 +2097,7 @@ async function generateMarketing(){
         </div>
       </div>`).join('');
   } catch(e) {
-    plan.innerHTML = '<div class="empty-state" style="color:var(--rose)">Failed. Try again.</div>';
+    plan.innerHTML = '<div class="empty-state" style="color:var(--rose)">Error: ' + e.message + '</div>';
   }
 }
 
