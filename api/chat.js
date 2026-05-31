@@ -14,7 +14,7 @@ export default async function handler(req) {
     return new Response(null, { status: 200, headers });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return new Response(JSON.stringify({ text: "", error: "No API key found" }), { status: 200, headers });
   }
@@ -23,20 +23,35 @@ export default async function handler(req) {
     const body = await req.json();
     const { messages, system } = body;
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 1500,
-        ...(system ? { system } : {}),
-        messages,
-      }),
-    });
+    // Convert messages to Gemini format
+    const geminiMessages = messages.map(m => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }]
+    }));
+
+    // Prepend system message as first user turn if exists
+    const systemInstruction = system ? { parts: [{ text: system }] } : undefined;
+
+    const requestBody = {
+      contents: geminiMessages,
+      generationConfig: {
+        maxOutputTokens: 1500,
+        temperature: 0.7,
+      }
+    };
+
+    if (systemInstruction) {
+      requestBody.systemInstruction = systemInstruction;
+    }
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      }
+    );
 
     const text = await response.text();
     const data = JSON.parse(text);
@@ -45,7 +60,7 @@ export default async function handler(req) {
       return new Response(JSON.stringify({ text: "", error: JSON.stringify(data) }), { status: 200, headers });
     }
 
-    const result = data.content?.[0]?.text || "";
+    const result = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     return new Response(JSON.stringify({ text: result }), { status: 200, headers });
 
   } catch (err) {
