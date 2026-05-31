@@ -3,23 +3,22 @@ export const config = {
 };
 
 export default async function handler(req) {
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
+
   if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
-      },
-    });
+    return new Response(null, { status: 200, headers });
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
+  
+  // Debug: check if key exists
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: "API key not configured" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(JSON.stringify({ text: "", error: "NO_API_KEY - key not found in environment" }), { status: 200, headers });
   }
 
   try {
@@ -44,23 +43,15 @@ export default async function handler(req) {
     });
 
     const data = await response.json();
-    const text = data.choices?.[0]?.message?.content || "";
     
-    return new Response(JSON.stringify({ text }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
+    if (!response.ok) {
+      return new Response(JSON.stringify({ text: "", error: JSON.stringify(data) }), { status: 200, headers });
+    }
+
+    const text = data.choices?.[0]?.message?.content || "";
+    return new Response(JSON.stringify({ text }), { status: 200, headers });
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
+    return new Response(JSON.stringify({ text: "", error: "CATCH: " + err.message }), { status: 200, headers });
   }
 }
