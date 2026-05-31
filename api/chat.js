@@ -14,29 +14,27 @@ export default async function handler(req) {
     return new Response(null, { status: 200, headers });
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return new Response(JSON.stringify({ text: "", error: "No API key" }), { status: 200, headers });
+    return new Response(JSON.stringify({ text: "", error: "No API key found" }), { status: 200, headers });
   }
 
   try {
     const body = await req.json();
     const { messages, system } = body;
 
-    const fullMessages = system
-      ? [{ role: "system", content: system }, ...messages]
-      : messages;
-
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "claude-haiku-4-5-20251001",
         max_tokens: 1500,
-        messages: fullMessages,
+        ...(system ? { system } : {}),
+        messages,
       }),
     });
 
@@ -47,7 +45,7 @@ export default async function handler(req) {
       return new Response(JSON.stringify({ text: "", error: JSON.stringify(data) }), { status: 200, headers });
     }
 
-    const result = data.choices?.[0]?.message?.content || "";
+    const result = data.content?.[0]?.text || "";
     return new Response(JSON.stringify({ text: result }), { status: 200, headers });
 
   } catch (err) {
